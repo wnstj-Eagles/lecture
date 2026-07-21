@@ -10,6 +10,9 @@ from __future__ import annotations
 import json
 import re
 import urllib.request
+import urllib.parse
+import http.cookiejar
+from html import unescape
 from datetime import datetime, timezone, timedelta
 from html.parser import HTMLParser
 from pathlib import Path
@@ -69,13 +72,18 @@ class RecordTableParser(HTMLParser):
             self.in_record = False
 
 
-def fetch_table(url: str) -> list[dict[str, str]]:
-    request = urllib.request.Request(
-        url,
-        headers={"User-Agent": "DugoutData/1.0 (daily statistics update)"},
-    )
-    with urllib.request.urlopen(request, timeout=30) as response:
-        html = response.read().decode("utf-8", errors="replace")
+USER_AGENT = "DugoutData/1.0 (daily statistics update)"
+OPENER = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(http.cookiejar.CookieJar()))
+
+
+def download(url: str, payload: dict[str, str] | None = None) -> str:
+    data = urllib.parse.urlencode(payload).encode() if payload else None
+    request = urllib.request.Request(url, data=data, headers={"User-Agent": USER_AGENT, "Referer": url})
+    with OPENER.open(request, timeout=30) as response:
+        return response.read().decode("utf-8", errors="replace")
+
+
+def parse_table(html: str, url: str) -> list[dict[str, str]]:
     parser = RecordTableParser()
     parser.feed(html)
     if not parser.headers or not parser.rows:
@@ -86,6 +94,47 @@ def fetch_table(url: str) -> list[dict[str, str]]:
         item = dict(zip(parser.headers, values))
         item["player_id"] = player_id
         records.append(item)
+    return records
+
+
+def fetch_table(url: str) -> list[dict[str, str]]:
+    """Fetch every ASP.NET pager page, not only the first 30 rows."""
+    first_html = download(url)
+    records = parse_table(first_html, url)
+    page_targets = {
+        int(number): unescape(target)
+        for target, number in re.findall(
+            r"__doPostBack\(&#39;([^']*ucPager\$btnNo(\d+))&#39;", first_html
+        )
+    }
+    print(f"Found pager pages {sorted(page_targets)} for {url}")
+    hidden = {
+        unescape(name): unescape(value)
+        for name, value in re.findall(
+            r'<input[^>]+type="hidden"[^>]+name="([^"]+)"[^>]+value="([^"]*)"', first_html
+        )
+    }
+    selected = {
+        unescape(name): unescape(value)
+        for name, options in re.findall(r'<select[^>]+name="([^"]+)"[^>]*>(.*?)</select>', first_html, re.S)
+        for value in re.findall(r'<option[^>]+selected="selected"[^>]+value="([^"]*)"', options)
+    }
+    manager_match = re.search(r"PageRequestManager\._initialize\('([^']+)'.*?\['t([^']+udpContent)'", first_html, re.S)
+    for page_number in sorted(page for page in page_targets if page > 1):
+        payload = dict(hidden)
+        payload.update(selected)
+        payload["__EVENTTARGET"] = page_targets[page_number]
+        payload["__EVENTARGUMENT"] = ""
+        for field_name in list(payload):
+            if field_name.endswith("$hfPage"):
+                payload[field_name] = str(page_number)
+        if manager_match:
+            payload[manager_match.group(1)] = f"{manager_match.group(2)}|{page_targets[page_number]}"
+        page_html = download(url, payload)
+        page_records = parse_table(page_html, url)
+        print(f"Fetched page {page_number}: {len(page_records)} rows, first={page_records[0]['player_id'] if page_records else '-'}")
+        existing_ids = {row["player_id"] for row in records}
+        records.extend(row for row in page_records if row["player_id"] not in existing_ids)
     return records
 
 
@@ -124,11 +173,14 @@ def main() -> None:
         wraa = (woba - league_woba) / woba_scale * pa
         wrc_plus = 100 * ((wraa / pa + league_r_per_pa) / league_r_per_pa) if pa and league_r_per_pa else 100
         offensive_war = (wraa + 20 * pa / 600) / runs_per_win
+        estimated_runs = wraa + league_r_per_pa * pa
         players.append({
             "id": base["player_id"], "name": base["선수명"], "team": base["팀명"], "league": "KBO",
             "g": int(number(base, "G")), "pa": int(pa), "avg": number(base, "AVG"),
-            "hr": int(number(base, "HR")), "rbi": int(number(base, "RBI")), "ops": number(rate, "OPS"),
-            "wrc": round(wrc_plus), "owar": round(offensive_war, 1),
+            "obp": number(rate, "OBP"), "hr": int(number(base, "HR")), "rbi": int(number(base, "RBI")),
+            "ops": number(rate, "OPS"), "wrc": round(wrc_plus), "owar": round(offensive_war, 1),
+            "xruns": round(estimated_runs, 1),
+            "raw": {key: int(number(rate if key in rate else base, key)) for key in ("PA", "AB", "R", "H", "2B", "3B", "HR", "BB", "IBB", "HBP", "SF")},
         })
     players.sort(key=lambda player: player["owar"], reverse=True)
     payload = {

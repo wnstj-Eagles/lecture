@@ -5,7 +5,7 @@
   <meta name="description" content="WAR과 wRC+를 야구팬의 언어로 설명하고 비교하는 독립 야구 통계 서비스입니다.">
   <title>더그아웃 데이터 | WAR·wRC+ 야구 통계</title>
   <link rel="stylesheet" href="assets/styles.css">
-  <script defer src="assets/app.js?v=20260721-2"></script>
+  <script defer src="assets/app.js?v=20260721-3"></script>
 </head>
 <body>
   <a class="skip" href="#content">본문 바로가기</a>
@@ -26,17 +26,12 @@
       <div class="section-head"><div><p class="eyebrow">PLAYER RANKINGS</p><h2>선수 가치 순위</h2></div><p>선수 검색과 리그·지표 필터를 이용해 원하는 기록을 빠르게 비교하세요.</p></div>
       <div class="controls">
         <label>선수 검색<input id="search" type="search" placeholder="선수명을 입력하세요"></label>
-        <label>리그<select id="league"><option value="all">전체</option><option value="KBO">KBO</option><option value="MLB">MLB</option></select></label>
-        <label>정렬<select id="sort"><option value="owar">공격 WAR*</option><option value="wrc">wRC+*</option><option value="ops">OPS</option><option value="hr">홈런</option></select></label>
+        <label>정렬<select id="sort"><option value="owar">WAR*</option><option value="wrc">wRC+*</option><option value="xruns">xRuns*</option><option value="ops">OPS</option><option value="avg">타율</option></select></label>
       </div>
-      <div class="table-wrap"><table><thead><tr><th>순위</th><th>선수</th><th>팀</th><th>공격 WAR*</th><th>wRC+*</th><th>AVG</th><th>HR</th><th>RBI</th><th>OPS</th></tr></thead><tbody id="stats-body">
-        <tr><td>1</td><td><span class="player"><span class="avatar">오</span>오스틴</span></td><td>LG</td><td>3.8</td><td>144</td><td>.337</td><td>28</td><td>84</td><td>1.077</td></tr>
-        <tr><td>2</td><td><span class="player"><span class="avatar">최</span>최원준</span></td><td>KT</td><td>2.6</td><td>122</td><td>.360</td><td>8</td><td>48</td><td>.953</td></tr>
-        <tr><td>3</td><td><span class="player"><span class="avatar">김</span>김도영</span></td><td>KIA</td><td>2.6</td><td>124</td><td>.295</td><td>27</td><td>77</td><td>.993</td></tr>
-        <tr><td>4</td><td><span class="player"><span class="avatar">강</span>강백호</span></td><td>한화</td><td>2.4</td><td>123</td><td>.315</td><td>23</td><td>86</td><td>.980</td></tr>
-        <tr><td>5</td><td><span class="player"><span class="avatar">페</span>페라자</span></td><td>한화</td><td>2.4</td><td>119</td><td>.305</td><td>18</td><td>55</td><td>.961</td></tr>
+      <div class="table-wrap"><table><thead><tr><th>순위</th><th>선수</th><th>팀</th><th>AVG</th><th>OBP</th><th>OPS</th><th>WAR*</th><th>wRC+*</th><th>xRuns*</th></tr></thead><tbody id="stats-body">
+        <tr><td>1</td><td><span class="player"><span class="avatar">오</span>오스틴</span></td><td>LG</td><td>.337</td><td>.420</td><td>1.077</td><td>3.8</td><td>144</td><td>82.3</td></tr>
       </tbody></table></div>
-      <p id="data-meta" class="data-note">KBO 공식 기록실 · 2026-07-21 16:21 KST 갱신 · 규정타석 대상 선수</p><p class="data-note">* 사이트 자체 추정치입니다. 구장·수비·주루·포지션 보정이 없어 공인 WAR 또는 타 통계 사이트의 wRC+와 다릅니다. AVG·HR·RBI·OPS는 KBO 기록실 수치입니다.</p>
+      <p id="data-meta" class="data-note">KBO 공식 기록실 · 규정타석 대상 선수 전원</p><p class="data-note">* 사이트 자체 추정치입니다. xRuns는 선형 가중치로 추정한 타격 득점 생산량입니다. 구장·수비·주루·포지션 보정이 없어 공인 WAR 또는 타 통계 사이트의 값과 다릅니다. AVG·OBP·OPS는 KBO 기록실 수치입니다.</p>
     </section>
 
     <section id="guide" class="section guide">
