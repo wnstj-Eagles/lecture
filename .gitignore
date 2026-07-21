@@ -1,0 +1,13 @@
+.env
+.env.*
+.venv/
+.vscode/
+__pycache__/
+*.py[cod]
+
+# Input documents, borrower data, and generated output may contain sensitive data.
+data/
+
+# Local debugging artifacts
+debug*.txt
+
