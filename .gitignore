@@ -6,8 +6,8 @@ __pycache__/
 *.py[cod]
 
 # Input documents, borrower data, and generated output may contain sensitive data.
-data/
+data/*
+!data/kbo_stats.json
 
 # Local debugging artifacts
 debug*.txt
-

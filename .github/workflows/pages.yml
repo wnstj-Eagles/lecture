@@ -4,6 +4,8 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  schedule:
+    - cron: "0 20 * * *"
 
 permissions:
   contents: read
@@ -23,6 +25,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+      - name: Refresh KBO statistics
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        run: python scripts/update_kbo_stats.py
       - name: Configure Pages
         uses: actions/configure-pages@v6
       - name: Upload static site

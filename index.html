@@ -17,20 +17,20 @@
   <main id="content">
     <section class="hero">
       <div><p class="eyebrow">BASEBALL, EXPLAINED</p><h1>숫자를 알면,<br><em>야구가 더 선명해진다.</em></h1><p>WAR과 wRC+를 한눈에 비교하고, 숫자가 경기에서 어떤 의미인지 쉽게 이해해 보세요.</p><a class="button" href="#rankings">오늘의 순위 보기</a></div>
-      <div class="score-card" aria-label="오늘의 지표 요약"><p>오늘의 리더</p><strong>김도윤</strong><dl><div><dt>WAR</dt><dd>5.8</dd></div><div><dt>wRC+</dt><dd>167</dd></div><div><dt>OPS</dt><dd>.982</dd></div></dl><small>데모 데이터 · 실제 연동 전</small></div>
+      <div class="score-card" aria-label="지표 안내"><p>직접 계산하는 기록</p><strong>KBO 타자 지표</strong><dl><div><dt>공격 WAR*</dt><dd>추정</dd></div><div><dt>wRC+*</dt><dd>추정</dd></div><div><dt>기본기록</dt><dd>공식</dd></div></dl><small>* 구장·수비·주루 보정 미포함</small></div>
     </section>
 
-    <section class="ticker" aria-label="서비스 안내"><span>데이터 상태</span><strong>현재 화면은 기능 검증용 데모 데이터입니다.</strong><span>실데이터 공급 계약 후 매일 갱신 예정</span></section>
+    <section class="ticker" aria-label="서비스 안내"><span>데이터 상태</span><strong>실제 KBO 기본기록 사용</strong><span>추정 지표의 산식과 한계를 공개합니다</span></section>
 
     <section id="rankings" class="section rankings">
       <div class="section-head"><div><p class="eyebrow">PLAYER RANKINGS</p><h2>선수 가치 순위</h2></div><p>선수 검색과 리그·지표 필터를 이용해 원하는 기록을 빠르게 비교하세요.</p></div>
       <div class="controls">
         <label>선수 검색<input id="search" type="search" placeholder="선수명을 입력하세요"></label>
         <label>리그<select id="league"><option value="all">전체</option><option value="KBO">KBO</option><option value="MLB">MLB</option></select></label>
-        <label>정렬<select id="sort"><option value="war">WAR</option><option value="wrc">wRC+</option><option value="ops">OPS</option></select></label>
+        <label>정렬<select id="sort"><option value="owar">공격 WAR*</option><option value="wrc">wRC+*</option><option value="ops">OPS</option><option value="hr">홈런</option></select></label>
       </div>
-      <div class="table-wrap"><table><thead><tr><th>순위</th><th>선수</th><th>리그·팀</th><th>WAR</th><th>wRC+</th><th>OPS</th></tr></thead><tbody id="stats-body"></tbody></table></div>
-      <p class="data-note">주의: 위 수치는 UI 시연을 위한 가상 데이터이며 경기 판단이나 기사 인용에 사용할 수 없습니다. 실제 서비스 전환 시 데이터 제공처와 최종 갱신 시각을 행별로 공개합니다.</p>
+      <div class="table-wrap"><table><thead><tr><th>순위</th><th>선수</th><th>팀</th><th>공격 WAR*</th><th>wRC+*</th><th>AVG</th><th>HR</th><th>RBI</th><th>OPS</th></tr></thead><tbody id="stats-body"><tr><td colspan="9">기록을 불러오는 중입니다.</td></tr></tbody></table></div>
+      <p id="data-meta" class="data-note">KBO 공식 기록을 불러오는 중입니다.</p><p class="data-note">* 사이트 자체 추정치입니다. 구장·수비·주루·포지션 보정이 없어 공인 WAR 또는 타 통계 사이트의 wRC+와 다릅니다. AVG·HR·RBI·OPS는 KBO 기록실 수치입니다.</p>
     </section>
 
     <section id="guide" class="section guide">
