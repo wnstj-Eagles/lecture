@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>제휴 문의</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: Pretendard, "Noto Sans KR", system-ui, sans-serif;
+      color: #172033;
+      background: #f4f6fa;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    .card {
+      width: min(100%, 640px);
+      padding: clamp(24px, 5vw, 48px);
+      border: 1px solid #e4e8f0;
+      border-radius: 20px;
+      background: #fff;
+      box-shadow: 0 18px 50px rgba(23, 32, 51, 0.08);
+    }
+
+    h1 { margin: 0 0 10px; font-size: clamp(28px, 5vw, 40px); }
+    .intro { margin: 0 0 32px; color: #667085; line-height: 1.7; }
+    .field { margin-bottom: 20px; }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 13px 14px;
+      border: 1px solid #cfd5df;
+      border-radius: 10px;
+      font: inherit;
+      color: inherit;
+      background: #fff;
+      transition: border-color .2s, box-shadow .2s;
+    }
+
+    textarea { min-height: 150px; resize: vertical; }
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: #315efb;
+      box-shadow: 0 0 0 3px rgba(49, 94, 251, 0.14);
+    }
+
+    .consent {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      margin: 4px 0 24px;
+      color: #475467;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .consent input { width: 18px; height: 18px; margin-top: 1px; }
+
+    button {
+      width: 100%;
+      padding: 14px 20px;
+      border: 0;
+      border-radius: 10px;
+      background: #315efb;
+      color: #fff;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    button:hover { background: #244bd6; }
+    button:disabled { opacity: .65; cursor: wait; }
+    .status { min-height: 24px; margin: 16px 0 0; text-align: center; font-size: 14px; }
+    .status.success { color: #08783e; }
+    .status.error { color: #c62828; }
+    .hidden { position: absolute; left: -9999px; }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>제휴 문의</h1>
+    <p class="intro">함께 만들고 싶은 프로젝트나 협업 아이디어를 남겨주세요. 확인 후 입력하신 이메일로 연락드리겠습니다.</p>
+
+    <form id="partnership-form" action="https://formspree.io/f/mykrpglb" method="POST">
+      <div class="field">
+        <label for="name">담당자명 *</label>
+        <input id="name" name="name" type="text" autocomplete="name" required>
+      </div>
+
+      <div class="field">
+        <label for="email">이메일 *</label>
+        <input id="email" name="email" type="email" autocomplete="email" required>
+      </div>
+
+      <div class="field">
+        <label for="company">회사·단체명</label>
+        <input id="company" name="company" type="text" autocomplete="organization">
+      </div>
+
+      <div class="field">
+        <label for="message">문의 내용 *</label>
+        <textarea id="message" name="message" placeholder="제휴 목적과 요청 사항을 자유롭게 적어주세요." required></textarea>
+      </div>
+
+      <input type="hidden" name="_subject" value="새로운 제휴 문의가 도착했습니다">
+      <label class="hidden" for="website">웹사이트 (작성하지 마세요)</label>
+      <input class="hidden" id="website" name="_gotcha" type="text" tabindex="-1" autocomplete="off">
+
+      <label class="consent">
+        <input name="privacy_consent" type="checkbox" value="동의" required>
+        <span>문의 답변을 위한 개인정보 수집 및 이용에 동의합니다. *</span>
+      </label>
+
+      <button type="submit">문의 보내기</button>
+      <p id="form-status" class="status" role="status" aria-live="polite"></p>
+    </form>
+  </main>
+
+  <script>
+    const form = document.querySelector("#partnership-form");
+    const button = form.querySelector("button");
+    const status = document.querySelector("#form-status");
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      button.disabled = true;
+      button.textContent = "전송 중...";
+      status.className = "status";
+      status.textContent = "";
+
+      try {
+        const response = await fetch(form.action, {
+          method: form.method,
+          body: new FormData(form),
+          headers: { Accept: "application/json" }
+        });
+
+        if (!response.ok) throw new Error("submission failed");
+
+        form.reset();
+        status.className = "status success";
+        status.textContent = "문의가 접수되었습니다. 빠르게 확인하겠습니다.";
+      } catch {
+        status.className = "status error";
+        status.textContent = "전송하지 못했습니다. 잠시 후 다시 시도해 주세요.";
+      } finally {
+        button.disabled = false;
+        button.textContent = "문의 보내기";
+      }
+    });
+  </script>
+</body>
+</html>
